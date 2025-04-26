@@ -1,0 +1,255 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borderplex RFI Accelerator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .result-panel {
+            display: none;
+            margin-top: 30px;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            animation: spin 2s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Borderplex RFI Accelerator</h1>
+            <p class="lead">Generate comprehensive RFI responses in minutes for the El Paso-Las Cruces-Juárez region</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Enter Your RFI Request</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="rfiForm">
+                            <div class="mb-3">
+                                <label for="prompt" class="form-label">Natural Language Request:</label>
+                                <input type="text" class="form-control" id="prompt" placeholder="Example: Generate an RFI for a 200-employee automotive supplier in El Paso" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Generate RFI</button>
+                        </form>
+                        <div class="loader" id="loader"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row result-panel" id="resultPanel">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Project Parameters</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="parametersForm">
+                            <div class="mb-3">
+                                <label for="industry" class="form-label">Industry:</label>
+                                <select class="form-select" id="industry">
+                                    <option value="automotive">Automotive</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="medical">Medical Devices</option>
+                                    <option value="aerospace">Aerospace</option>
+                                    <option value="manufacturing">Manufacturing</option>
+                                    <option value="logistics">Logistics</option>
+                                    <option value="technology">Technology</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="employees" class="form-label">Employees:</label>
+                                <input type="number" class="form-control" id="employees" min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location:</label>
+                                <select class="form-select" id="location">
+                                    <option value="El Paso">El Paso</option>
+                                    <option value="Las Cruces">Las Cruces</option>
+                                    <option value="Juarez">Juarez</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="capex" class="form-label">Capital Investment ($):</label>
+                                <input type="number" class="form-control" id="capex" min="0">
+                            </div>
+                            <button type="submit" class="btn btn-secondary">Update Analysis</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Economic Impact Analysis</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Direct Jobs</th>
+                                        <td id="directJobs">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Indirect Jobs</th>
+                                        <td id="indirectJobs">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Jobs</th>
+                                        <td id="totalJobs">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Annual Payroll</th>
+                                        <td id="annualPayroll">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Economic Output</th>
+                                        <td id="economicOutput">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Annual Tax Revenue</th>
+                                        <td id="taxRevenue">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Export Options</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="/download_pdf" class="btn btn-primary me-md-2" id="pdfBtn">Download PDF</a>
+                            <a href="/download_json" class="btn btn-outline-primary" id="jsonBtn">Download JSON</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('rfiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loader
+            document.getElementById('loader').style.display = 'block';
+            
+            // Get the prompt value
+            const prompt = document.getElementById('prompt').value;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('prompt', prompt);
+            
+            // Send the request
+            fetch('/process_rfi', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loader
+                document.getElementById('loader').style.display = 'none';
+                
+                // Show results panel
+                document.getElementById('resultPanel').style.display = 'flex';
+                
+                // Update form values
+                document.getElementById('industry').value = data.parameters.industry;
+                document.getElementById('employees').value = data.parameters.employees;
+                document.getElementById('location').value = data.parameters.location;
+                document.getElementById('capex').value = data.parameters.capex;
+                
+                // Update economic impact values
+                updateEconomicImpact(data.economic_impact);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loader').style.display = 'none';
+                alert('An error occurred while processing your request.');
+            });
+        });
+        
+        document.getElementById('parametersForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get updated parameter values
+            const updatedParams = {
+                industry: document.getElementById('industry').value,
+                employees: document.getElementById('employees').value,
+                location: document.getElementById('location').value,
+                capex: document.getElementById('capex').value
+            };
+            
+            // Send the update request
+            fetch('/update_parameters', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedParams)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update economic impact values
+                updateEconomicImpact(data.economic_impact);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating parameters.');
+            });
+        });
+        
+        function updateEconomicImpact(impact) {
+            document.getElementById('directJobs').textContent = impact.direct_jobs.toLocaleString();
+            document.getElementById('indirectJobs').textContent = impact.indirect_jobs.toLocaleString();
+            document.getElementById('totalJobs').textContent = impact.total_jobs.toLocaleString();
+            document.getElementById('annualPayroll').textContent = '$' + impact.annual_payroll.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('economicOutput').textContent = '$' + impact.total_economic_output.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('taxRevenue').textContent = '$' + impact.tax_revenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+    </script>
+    
+    <footer class="mt-5 pt-3 text-muted text-center text-small">
+        <p class="mb-1">&copy; 2025 Borderplex RFI Accelerator</p>
+        <p>Generated RFI responses in under 5 minutes</p>
+    </footer>
+</body>
+</html>
